@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+    <style>
+    * {
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 1px;
+        /*font-size: 16px*/
+    }
+    </style>
+    <title>Electron Sqlite</title>
+</head>
+
+<body class="p-2">
+    <ul class="list-group">
+        <li class="list-group-item">
+            <div class="btn btn-primary" id="create"><small><strong class="text-uppercase">create user info table</strong></small></div>
+        </li>
+        <li class="list-group-item">
+            <div class="btn btn-primary" id="show"><small><strong class="text-uppercase">show user info</strong></small></div>
+        </li>
+        <li class="list-group-item">
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">User Information</label>
+                <textarea id="information" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
+            <div class="btn btn-primary" id="add"><small><strong class="text-uppercase">add user info</strong></small></div>
+        </li>
+    </ul>
+    <script src="./renderer.js"></script>
+    <script>
+    var sqlite3 = require('sqlite3').verbose();
+    var db = new sqlite3.Database('database.db');
+
+    // db.close();
+
+    document.getElementById('add').addEventListener('click', () => {
+        db.serialize(function() {
+            const information = document.getElementById('information').value;
+            sql = "INSERT INTO user_info (info) VALUES ('" + information + "')";
+            db.run(sql);
+            console.log("Data inserted successfully");
+        });
+    });
+
+    document.getElementById('create').addEventListener('click', () => {
+        db.serialize(function() {
+            db.run("CREATE TABLE if not exists user_info (info TEXT)");
+            console.log("User Info table created successfully");
+        });
+    });
+
+    document.getElementById('show').addEventListener('click', () => {
+        db.serialize(function() {
+            db.each("SELECT rowid AS id, info FROM user_info", function(err, row) {
+                // console.log(row.id + ": " + row.info);
+                console.log(row);
+            });
+        });
+    });
+    </script>
+</body>
+
+</html>
